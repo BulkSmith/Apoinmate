@@ -214,21 +214,21 @@ export function DoctorResults({
           </div>
         </aside>
 
-        <div>
-          <div className="glass mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl px-4 py-3">
+        <div className="min-w-0">
+          <div className="glass mb-5 flex flex-col items-stretch gap-3 rounded-2xl px-4 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <p className="text-sm text-navy">
               <strong>{results.length}</strong> doctors found
             </p>
-            <div className="flex items-center gap-2">
+            <div className="flex w-full min-w-0 flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
               <Button
                 variant="outline"
-                className="rounded-xl bg-card/70 lg:hidden"
+                className="w-full rounded-xl bg-card/70 sm:w-auto lg:hidden"
                 onClick={() => setShowFilters((s) => !s)}
               >
                 <SlidersHorizontal className="mr-2 h-4 w-4" /> Filters
               </Button>
               <Select value={sort} onValueChange={setSort}>
-                <SelectTrigger className="w-52 rounded-xl bg-card/80">
+                <SelectTrigger className="w-full min-w-0 rounded-xl bg-card/80 sm:w-52">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

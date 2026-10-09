@@ -1,17 +1,22 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
-import serviceAppointmentsAsset from "@/assets/service-doctor-appointment-v2.jpg.asset.json";
+import serviceAppointmentsImage from "@/assets/service-appointments.png";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/lib/i18n";
 import { Section, SectionHeading } from "./Section";
 
 export const SERVICES = [
   {
-    image: serviceAppointmentsAsset.url,
+    image: serviceAppointmentsImage,
     title: "Doctor Appointments",
     text: "Book in-clinic appointments with verified doctors near you — pick a slot and get instant confirmation.",
     live: true,
-    features: ["Verified specialists", "Instant confirmation", "Transparent fees", "Private records"],
+    features: [
+      "Verified specialists",
+      "Instant confirmation",
+      "Transparent fees",
+      "Private records",
+    ],
   },
 ] as const;
 
@@ -56,7 +61,9 @@ export function ServicesSection() {
                   live ? "bg-success text-success-foreground" : "bg-card text-muted-foreground"
                 }`}
               >
-                <span className={`h-1.5 w-1.5 rounded-full ${live ? "animate-pulse bg-success-foreground" : "bg-muted-foreground"}`} />
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${live ? "animate-pulse bg-success-foreground" : "bg-muted-foreground"}`}
+                />
                 {live ? t("Available now", "अभी उपलब्ध") : t("Coming soon", "जल्द आ रहा है")}
               </span>
             </div>

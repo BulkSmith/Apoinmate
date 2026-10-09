@@ -1,6 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import { Settings, LogOut } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/layout/SiteLayout";
@@ -28,12 +28,20 @@ export function DashboardShell({
 }) {
   const { t } = useLang();
   const navigate = useNavigate();
+  const router = useRouter();
   const greeting = greetingFor();
 
   async function signOut() {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error(
+        t("Could not sign out. Please try again.", "साइन आउट नहीं हो सका। फिर से प्रयास करें।"),
+      );
+      return;
+    }
     toast.success(t("Signed out", "साइन आउट हो गए"));
-    void navigate({ to: "/" });
+    await router.invalidate();
+    void navigate({ to: "/", replace: true });
   }
 
   const NavButton = ({ item }: { item: NavItem }) => {

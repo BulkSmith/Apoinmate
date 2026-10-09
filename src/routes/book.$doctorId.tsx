@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
@@ -27,8 +27,12 @@ import { getDoctor, TIME_SLOTS } from "@/data/doctors";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { getListedDoctor } from "@/lib/listings.functions";
 import { buildAppointment, createAppointment } from "@/services/appointment-service";
+import { requireRouteAuth } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/book/$doctorId")({
+  ssr: false,
+  beforeLoad: ({ params }) => requireRouteAuth(`/book/${encodeURIComponent(params.doctorId)}`),
+  shouldReload: true,
   loader: async ({ params }) => {
     const doctor = getDoctor(params.doctorId) ?? (await getListedDoctor({ data: { id: params.doctorId } }));
     if (!doctor) throw notFound();
@@ -91,6 +95,7 @@ const MAX_POLLS = 5;
 
 function BookAppointment() {
   const { doctor } = Route.useLoaderData();
+  const navigate = useNavigate();
   const { user, loading: authLoading } = useAuthUser();
   const [step, setStep] = useState(0);
   const [date, setDate] = useState<Date>(new Date());
@@ -102,6 +107,17 @@ function BookAppointment() {
   const [pollCount, setPollCount] = useState(0);
   const [checking, setChecking] = useState(false);
   const pollsRef = useRef(0);
+  const redirectTo = `/book/${encodeURIComponent(doctor.id)}`;
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      void navigate({
+        to: "/auth",
+        search: { mode: "login", redirect: redirectTo },
+        replace: true,
+      });
+    }
+  }, [authLoading, user, navigate, redirectTo]);
 
   const bookingId = useMemo(
     () => `APM${Math.floor(100000 + Math.random() * 899999)}`,
@@ -243,7 +259,6 @@ function BookAppointment() {
   }
 
   if (!user) {
-    const redirectTo = `/book/${doctor.id}`;
     return (
       <SiteLayout>
         <div className="mx-auto max-w-md px-4 py-16 sm:px-6">

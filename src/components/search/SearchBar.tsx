@@ -83,7 +83,7 @@ export function SearchBar({
         </Button>
       </div>
       <p className="mt-3 px-1 text-xs text-muted-foreground">
-        Try: “Cardiologist in Muzaffarpur”, “Dermatologist near me”, “General physician”
+        Try: “Cardiologist”, “Dermatologist” or “General Physician”
       </p>
     </form>
   );

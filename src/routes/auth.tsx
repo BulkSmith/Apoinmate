@@ -75,8 +75,13 @@ function Auth() {
           .maybeSingle();
         if (!profile?.onboarding_complete) {
           navigate({ to: "/onboarding/patient" });
-        } else if (redirect) {
-          navigate({ href: redirect });
+        } else if (redirect && redirect.startsWith("/") && !redirect.startsWith("//")) {
+          const target = new URL(redirect, window.location.origin);
+          if (target.origin === window.location.origin) {
+            navigate({ href: `${target.pathname}${target.search}${target.hash}` });
+          } else {
+            navigate({ to: "/dashboard/patient" });
+          }
         } else {
           navigate({ to: "/dashboard/patient" });
         }

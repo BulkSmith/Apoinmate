@@ -4,8 +4,8 @@ import { useLang } from "@/lib/i18n";
 
 const ITEMS = [
   { to: "/", label: "Home", hi: "होम", icon: Home },
-  { to: "/find-doctors", label: "Find Doctor", hi: "डॉक्टर", icon: Search },
-  { to: "/dashboard/patient", label: "Appointments", hi: "अपॉइंटमेंट", icon: CalendarDays },
+  { to: "/find-doctors", label: "Doctors", hi: "डॉक्टर", icon: Search },
+  { to: "/dashboard/patient", label: "Visits", hi: "बुकिंग", icon: CalendarDays },
   { to: "/ai-assistant", label: "Aira", hi: "आइरा", icon: Sparkles },
   { to: "/auth", label: "Profile", hi: "प्रोफ़ाइल", icon: User },
 ] as const;
@@ -22,7 +22,8 @@ export function MobileTabBar() {
           key={label}
           to={to}
           activeProps={{ className: "text-primary" }}
-          className="flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium text-muted-foreground"
+          aria-label={label === "Visits" ? t("Appointments", "अपॉइंटमेंट") : t(label, hi)}
+          className="flex min-w-0 flex-col items-center gap-1 whitespace-nowrap py-2.5 text-[11px] font-medium leading-none text-muted-foreground"
         >
           <Icon className="h-5 w-5" aria-hidden="true" />
           {t(label, hi)}

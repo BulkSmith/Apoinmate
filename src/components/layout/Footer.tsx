@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone, Twitter } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import logo from "../../../.lovable/logo/apoinmate logo.png";
+import { SITE } from "@/config/site";
 import { useLang } from "@/lib/i18n";
 
 const COLUMNS_HI: Record<string, string> = {
@@ -17,8 +18,6 @@ const COLUMNS_HI: Record<string, string> = {
   "Partner With Us": "हमारे साथ जुड़ें",
   About: "हमारे बारे में",
   Contact: "संपर्क",
-  Careers: "करियर",
-  Blog: "ब्लॉग",
   "Help Center": "सहायता केंद्र",
   FAQs: "सामान्य प्रश्न",
   "Privacy Policy": "गोपनीयता नीति",
@@ -49,8 +48,6 @@ const COLUMNS = [
     links: [
       { to: "/about", label: "About" },
       { to: "/contact", label: "Contact" },
-      { to: "/about", label: "Careers" },
-      { to: "/about", label: "Blog" },
     ],
   },
   {
@@ -92,25 +89,24 @@ export function Footer() {
                 Bihar, India
               </li>
               <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />{" "}
-                support@apoinmate.com
+                <Mail className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                <a
+                  href={`mailto:${SITE.supportEmail}`}
+                  className="transition-colors hover:text-primary"
+                >
+                  {SITE.supportEmail}
+                </a>
               </li>
               <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" /> +91 9065407472
+                <Phone className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                <a
+                  href={`tel:${SITE.supportPhone.replaceAll(" ", "")}`}
+                  className="transition-colors hover:text-primary"
+                >
+                  {SITE.supportPhone}
+                </a>
               </li>
             </ul>
-            <div className="mt-5 flex gap-3">
-              {[Twitter, Instagram, Linkedin, Facebook].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  aria-label="Apoinmate social profile"
-                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 text-navy-foreground transition-colors hover:bg-primary hover:text-primary-foreground"
-                >
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                </a>
-              ))}
-            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">

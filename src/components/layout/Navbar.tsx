@@ -32,9 +32,7 @@ export function Navbar() {
           onClick={() => setLang(l)}
           aria-pressed={lang === l}
           className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors ${
-            lang === l
-              ? "bg-primary text-primary-foreground"
-              : "text-navy/70 hover:text-primary"
+            lang === l ? "bg-primary text-primary-foreground" : "text-navy/70 hover:text-primary"
           }`}
         >
           {l === "en" ? "EN" : "हिं"}
@@ -52,7 +50,7 @@ export function Navbar() {
         >
           <Logo className="shrink-0" />
 
-          <div className="hidden min-w-0 items-center gap-1 lg:flex">
+          <div className="hidden min-w-0 items-center gap-1 xl:flex">
             {NAV.map((item) => (
               <Link
                 key={item.to}
@@ -67,12 +65,12 @@ export function Navbar() {
 
           <div className="flex shrink-0 items-center gap-2">
             <LangToggle className="hidden sm:inline-flex" />
-            <Button asChild variant="ghost" className="hidden rounded-xl md:inline-flex">
+            <Button asChild variant="ghost" className="hidden rounded-xl xl:inline-flex">
               <Link to="/auth" search={{ mode: "login" }}>
                 {t("Log in", "लॉग इन")}
               </Link>
             </Button>
-            <Button asChild className="hidden rounded-xl md:inline-flex">
+            <Button asChild className="hidden rounded-xl xl:inline-flex">
               <Link to="/auth" search={{ mode: "signup" }}>
                 {t("Sign up", "साइन अप")}
               </Link>
@@ -80,7 +78,7 @@ export function Navbar() {
 
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="rounded-xl lg:hidden">
+                <Button variant="outline" size="icon" className="rounded-xl xl:hidden">
                   <Menu className="h-5 w-5" />
                   <span className="sr-only">Open menu</span>
                 </Button>

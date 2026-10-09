@@ -108,7 +108,6 @@ function AiraText({ text, animate }: { text: string; animate?: boolean | undefin
   );
 }
 
-
 function AiAssistant() {
   const ask = useServerFn(askAira);
   const [messages, setMessages] = useState<Msg[]>([
@@ -164,7 +163,7 @@ function AiAssistant() {
           </p>
         </div>
 
-        <div className="glass-card mt-8 flex h-[560px] flex-col p-4 sm:p-6">
+        <div className="glass-card mt-8 flex h-[min(70dvh,680px)] min-h-[22rem] flex-col p-4 sm:p-6">
           <div className="flex items-center gap-3 border-b border-border/60 pb-4">
             <img
               src={airaAvatar}
@@ -220,7 +219,6 @@ function AiAssistant() {
             )}
             <div ref={endRef} />
           </div>
-
 
           {booking && (
             <div className="mb-3">

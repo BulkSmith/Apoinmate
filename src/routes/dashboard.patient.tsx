@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import {
   CalendarCheck,
   ClipboardList,
@@ -12,8 +13,13 @@ import { MedicalRecords } from "@/components/records/MedicalRecords";
 import { meta } from "@/components/pages/PageKit";
 import { Button } from "@/components/ui/button";
 import { DOCTORS } from "@/data/doctors";
+import { useAuthUser, useProfile } from "@/hooks/useAuthUser";
+import { requireRouteAuth } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/dashboard/patient")({
+  ssr: false,
+  beforeLoad: () => requireRouteAuth("/dashboard/patient"),
+  shouldReload: true,
   head: () =>
     meta(
       "Patient Dashboard | Apoinmate",
@@ -23,6 +29,9 @@ export const Route = createFileRoute("/dashboard/patient")({
 });
 
 function PatientDashboard() {
+  const navigate = useNavigate();
+  const { user, loading } = useAuthUser();
+  const { profile } = useProfile(user?.id ?? null);
   const next = DOCTORS[0]!;
   const cards = [
     { icon: CalendarCheck, label: "Upcoming appointments", value: "1" },
@@ -31,10 +40,32 @@ function PatientDashboard() {
     { icon: CreditCard, label: "Total paid", value: "₹3,180" },
   ];
 
+  useEffect(() => {
+    if (!loading && !user) {
+      void navigate({
+        to: "/auth",
+        search: { mode: "login", redirect: "/dashboard/patient" },
+        replace: true,
+      });
+    }
+  }, [loading, user, navigate]);
+
+  if (loading || !user) {
+    return (
+      <SiteLayout>
+        <div className="flex min-h-[50vh] items-center justify-center text-sm text-muted-foreground">
+          Checking your session…
+        </div>
+      </SiteLayout>
+    );
+  }
+
   return (
     <SiteLayout>
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-        <h1 className="text-3xl font-bold text-navy sm:text-4xl">Your health dashboard</h1>
+        <h1 className="text-3xl font-bold text-navy sm:text-4xl">
+          {profile?.full_name ? `${profile.full_name}'s health dashboard` : "Your health dashboard"}
+        </h1>
         <p className="mt-2 text-muted-foreground">
           Everything about your care in one place — appointments, records and payments.
         </p>

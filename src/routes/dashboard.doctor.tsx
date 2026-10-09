@@ -25,9 +25,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser, useProfile } from "@/hooks/useAuthUser";
 import { signedAvatarUrl } from "@/lib/avatar";
 import { useLang } from "@/lib/i18n";
+import { requireDoctorRouteAuth } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/dashboard/doctor")({
   ssr: false,
+  beforeLoad: () => requireDoctorRouteAuth("/dashboard/doctor"),
+  shouldReload: true,
   head: () =>
     meta(
       "Doctor dashboard | Apoinmate",
@@ -59,7 +62,13 @@ function DoctorDashboard() {
   const clinic = useClinicAppointments(user?.id ?? "");
 
   useEffect(() => {
-    if (!loading && !user) void navigate({ to: "/doctor-signup" });
+    if (!loading && !user) {
+      void navigate({
+        to: "/auth",
+        search: { mode: "login", redirect: "/dashboard/doctor" },
+        replace: true,
+      });
+    }
   }, [loading, user, navigate]);
 
   useEffect(() => {

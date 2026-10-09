@@ -6,9 +6,12 @@ import { meta } from "@/components/pages/PageKit";
 import { ProfileSettings } from "@/components/dashboard/ProfileSettings";
 import { useAuthUser, useProfile } from "@/hooks/useAuthUser";
 import { useLang } from "@/lib/i18n";
+import { requireRouteAuth } from "@/lib/route-auth";
 
 export const Route = createFileRoute("/onboarding/patient")({
   ssr: false,
+  beforeLoad: () => requireRouteAuth("/onboarding/patient"),
+  shouldReload: true,
   head: () =>
     meta(
       "Complete your patient profile | Apoinmate",
@@ -24,7 +27,13 @@ function PatientOnboarding() {
   const { profile } = useProfile(user?.id ?? null);
 
   useEffect(() => {
-    if (!loading && !user) void navigate({ to: "/auth", search: { mode: "signup" } });
+    if (!loading && !user) {
+      void navigate({
+        to: "/auth",
+        search: { mode: "login", redirect: "/onboarding/patient" },
+        replace: true,
+      });
+    }
   }, [loading, user, navigate]);
 
   const steps = [
