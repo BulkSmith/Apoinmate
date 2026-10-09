@@ -27,7 +27,13 @@ export const Route = createFileRoute("/ai-assistant")({
   component: AiAssistant,
 });
 
-type Msg = { role: "user" | "assistant"; content: string; animate?: boolean };
+type Msg = {
+  role: "user" | "assistant";
+  content: string;
+  animate?: boolean;
+  failed?: boolean;
+  retryable?: boolean;
+};
 
 const STARTERS = [
   "I have fever and body pain for 3 days",
@@ -121,30 +127,61 @@ function AiAssistant() {
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const requestInFlight = useRef(false);
 
-  async function send(text: string) {
-    const trimmed = text.trim();
-    if (!trimmed || loading) return;
-    const next: Msg[] = [...messages, { role: "user", content: trimmed }];
-    setMessages(next);
-    setInput("");
+  async function requestReply(history: Msg[]) {
+    if (requestInFlight.current) return;
+    requestInFlight.current = true;
     setLoading(true);
     try {
-      const res = await ask({ data: { messages: next.slice(-20) } });
-      setMessages([...next, { role: "assistant", content: res.reply, animate: true }]);
-    } catch {
+      const res = await ask({
+        data: {
+          messages: history
+            .filter((message) => !message.failed)
+            .slice(-20)
+            .map(({ role, content }) => ({ role, content })),
+        },
+      });
       setMessages([
-        ...next,
+        ...history,
         {
           role: "assistant",
-          content: "Sorry, I couldn't respond just now. Please try again in a moment.",
+          content: res.reply,
           animate: true,
+          failed: !res.ok,
+          retryable: !res.ok && res.code !== "missing_config" && res.code !== "invalid_model",
+        },
+      ]);
+    } catch {
+      setMessages([
+        ...history,
+        {
+          role: "assistant",
+          content: "Aira couldn't reach its service. Please check your connection and retry.",
+          animate: true,
+          failed: true,
+          retryable: true,
         },
       ]);
     } finally {
+      requestInFlight.current = false;
       setLoading(false);
       requestAnimationFrame(() => endRef.current?.scrollIntoView({ behavior: "smooth" }));
     }
+  }
+
+  async function send(text: string) {
+    const trimmed = text.trim();
+    if (!trimmed || requestInFlight.current) return;
+    const next: Msg[] = [...messages, { role: "user", content: trimmed }];
+    setMessages(next);
+    setInput("");
+    await requestReply(next);
+  }
+
+  async function retry(index: number) {
+    if (requestInFlight.current) return;
+    await requestReply(messages.slice(0, index));
   }
 
   return (
@@ -199,6 +236,16 @@ function AiAssistant() {
                   />
                   <div className="min-w-0 rounded-2xl rounded-bl-sm bg-card px-4 py-3 shadow-sm ring-1 ring-border/60">
                     <AiraText text={m.content} animate={m.animate} />
+                    {m.failed && m.retryable && (
+                      <button
+                        type="button"
+                        className="mt-2 text-xs font-semibold text-primary underline-offset-2 hover:underline disabled:opacity-50"
+                        disabled={loading}
+                        onClick={() => void retry(i)}
+                      >
+                        Retry
+                      </button>
+                    )}
                   </div>
                 </div>
               ),
@@ -222,19 +269,7 @@ function AiAssistant() {
 
           {booking && (
             <div className="mb-3">
-              <ChatBooking
-                onClose={() => setBooking(false)}
-                onBooked={(summary) =>
-                  setMessages((m) => [
-                    ...m,
-                    {
-                      role: "assistant",
-                      content: `Your appointment is confirmed: **${summary}**. You can see it any time in your patient dashboard.`,
-                      animate: true,
-                    },
-                  ])
-                }
-              />
+              <ChatBooking onClose={() => setBooking(false)} />
             </div>
           )}
 
@@ -279,11 +314,19 @@ function AiAssistant() {
               className="h-12 rounded-2xl bg-card/80 text-base"
               aria-label="Message Aira"
             />
-            <Button type="submit" size="lg" className="h-12 rounded-2xl px-5" disabled={loading}>
+            <Button
+              type="submit"
+              size="lg"
+              className="h-12 rounded-2xl px-5"
+              disabled={loading || !input.trim()}
+            >
               <Send className="h-4 w-4" />
               <span className="sr-only">Send</span>
             </Button>
           </form>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Please don&apos;t include your name, phone number, or other identifying details.
+          </p>
         </div>
 
         <div className="mt-5 rounded-2xl border border-warning/40 bg-warning/10 p-4 text-sm text-navy">

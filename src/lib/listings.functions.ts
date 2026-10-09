@@ -47,22 +47,24 @@ export function listingToDoctor(r: ListingRow): Doctor {
 }
 
 export const getListedDoctor = createServerFn({ method: "GET" })
-  .inputValidator((d) => z.object({ id: z.string().min(1).max(64) }).parse(d))
+  .validator((d) => z.object({ id: z.string().min(1).max(64) }).parse(d))
   .handler(async ({ data }) => {
-    const { data: row } = await publicClient()
+    const { data: row, error } = await publicClient()
       .from("doctor_listings")
       .select("*")
       .eq("id", data.id)
       .eq("is_active", true)
       .maybeSingle();
+    if (error) throw error;
     return row ? listingToDoctor(row) : null;
   });
 
 export const listListedDoctors = createServerFn({ method: "GET" }).handler(async () => {
-  const { data } = await publicClient()
+  const { data, error } = await publicClient()
     .from("doctor_listings")
     .select("*")
     .eq("is_active", true)
     .order("created_at", { ascending: false });
-  return (data ?? []).map(listingToDoctor);
+  if (error) throw error;
+  return data.map(listingToDoctor);
 });
