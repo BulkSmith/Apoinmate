@@ -27,11 +27,10 @@ export function Hero() {
 
   return (
     <section className="relative isolate overflow-hidden border-b border-border/60 bg-[radial-gradient(circle_at_top_left,_rgba(166,196,255,0.35),transparent_24%),radial-gradient(circle_at_bottom_right,_rgba(38,103,245,0.12),transparent_32%),linear-gradient(180deg,#f4f8ff_0%,#edf5ff_100%)]">
-      <img
-        src={heroClinic}
-        alt=""
+      <div
+        className="absolute inset-0 bg-cover bg-right bg-no-repeat"
+        style={{ backgroundImage: `url("${heroClinic}")` }}
         aria-hidden="true"
-        className="absolute inset-0 h-full w-full object-contain object-bottom lg:object-cover lg:object-right"
       />
       <div
         className="absolute inset-0 bg-gradient-to-r from-[#f4f8ff]/95 via-[#f4f8ff]/70 via-40% to-transparent"
